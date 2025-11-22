@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: product-scraper-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/smart_guide_poc}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: false  # Main app handles migrations
+
+server:
+  port: ${SCRAPER_SERVER_PORT:8081}
+  error:
+    include-message: always
+
+# Springdoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /docs
+    enabled: true
+
+# Application Configuration
+app:
+  main-service:
+    url: ${MAIN_SERVICE_URL:http://localhost:8080}
+
+logging:
+  level:
+    root: INFO
+    com.smartguide.scraper: DEBUG
+    com.microsoft.playwright: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

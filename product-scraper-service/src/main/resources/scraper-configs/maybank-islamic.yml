@@ -1,0 +1,48 @@
+# Example configuration for Maybank Islamic Malaysia
+# Note: This is a template based on typical Islamic bank structures
+# Adjust selectors based on actual website inspection
+
+websiteId: "maybank_islamic"
+websiteName: "Maybank Islamic"
+baseUrl: "https://www.maybank2u.com.my"
+
+navigation:
+  startUrl: "https://www.maybank2u.com.my/en/islamic.page"
+  productListUrl: "https://www.maybank2u.com.my/en/islamic.page"
+  maxPages: 3
+  waitAfterLoad: 3000
+
+selectors:
+  productList: ".product-item, .product-card"
+  productLink: "a[href*='product'], a[href*='islamic']"
+
+  productName: "h1, .product-name, .title"
+  productCode: ".product-id, .sku"
+  category: ".category, .product-type"
+  description: ".description, .product-desc, .overview"
+  islamicStructure: ".shariah-principle, .islamic-concept"
+  annualRate: ".rate, .profit-rate, .percentage"
+  annualFee: ".fee, .annual-fee, .charges"
+  minIncome: ".income-requirement, .min-income"
+  keyBenefits: ".benefits li, .features li, .highlights li"
+
+mapping:
+  defaultCategory: "FINANCING"
+  categoryMapping:
+    "Credit Card": "CREDIT_CARD"
+    "Current Account": "CASA"
+    "Savings Account": "CASA"
+    "Home Financing": "FINANCING"
+    "Personal Financing": "FINANCING"
+    "Vehicle Financing": "FINANCING"
+    "Investment": "INVESTMENT"
+  shariaCertified: true
+  active: true
+
+options:
+  aiEnrichment: true
+  headless: true
+  timeout: 40000
+  screenshot: false
+  retryCount: 2
+  delayBetweenRequests: 2000

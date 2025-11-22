@@ -1,0 +1,52 @@
+# Example scraper configuration for a banking website
+# This is a template - adjust selectors based on actual website structure
+
+websiteId: "example_bank"
+websiteName: "Example Islamic Bank"
+baseUrl: "https://www.examplebank.com"
+
+navigation:
+  startUrl: "https://www.examplebank.com/products"
+  productListUrl: "https://www.examplebank.com/products"
+  maxPages: 5
+  nextPageSelector: "a.pagination-next"
+  waitAfterLoad: 2000  # Wait 2 seconds after page load
+
+selectors:
+  # List page selectors
+  productList: ".product-card"
+  productLink: "a.product-url"
+
+  # Product detail page selectors
+  productName: "h1.product-title"
+  productCode: ".product-code"
+  category: ".product-category"
+  subCategory: ".product-subcategory"
+  description: ".product-description"
+  islamicStructure: ".islamic-structure"
+  annualRate: ".annual-rate"
+  annualFee: ".annual-fee"
+  minIncome: ".minimum-income"
+  minCreditScore: ".min-credit-score"
+  keyBenefits: ".benefits-list li"
+  eligibilityCriteria: ".eligibility-item"
+
+mapping:
+  defaultCategory: "FINANCING"
+  categoryMapping:
+    "Credit Cards": "CREDIT_CARD"
+    "Savings Account": "CASA"
+    "Home Financing": "FINANCING"
+    "Personal Financing": "FINANCING"
+    "Auto Financing": "FINANCING"
+  shariaCertified: true
+  active: true
+
+options:
+  aiEnrichment: true
+  headless: true
+  timeout: 30000
+  screenshot: false
+  screenshotPath: "/tmp/scraper-screenshots"
+  retryCount: 3
+  delayBetweenRequests: 1000  # 1 second delay between product pages

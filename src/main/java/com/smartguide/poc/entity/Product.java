@@ -74,4 +74,17 @@ public class Product {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    // Scraping metadata fields
+    @Column(name = "source_website_id", length = 100)
+    private String sourceWebsiteId;
+
+    @Column(name = "source_url", columnDefinition = "TEXT")
+    private String sourceUrl;
+
+    @Column(name = "scraped_at")
+    private LocalDateTime scrapedAt;
+
+    @Column(name = "data_quality_score", precision = 3, scale = 2)
+    private BigDecimal dataQualityScore;
 }
