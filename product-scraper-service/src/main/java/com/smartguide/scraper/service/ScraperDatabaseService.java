@@ -58,27 +58,24 @@ public class ScraperDatabaseService {
     }
 
     /**
-     * Save scraped products to database
+     * Save scraped products to staging table for review
      */
     @Transactional
-    public int saveProducts(List<ScrapedProduct> products, LocalDateTime scrapedAt) {
+    public int saveProducts(List<ScrapedProduct> products, LocalDateTime scrapedAt, String jobId) {
         int savedCount = 0;
 
-        String upsertSql = """
-            INSERT INTO products (
+        // Get scrape_log_id from job_id
+        Long scrapeLogId = getScrapeLogIdByJobId(jobId);
+
+        String insertSql = """
+            INSERT INTO staging_products (
                 product_code, product_name, category, sub_category, description,
                 islamic_structure, annual_rate, annual_fee, min_income, min_credit_score,
                 eligibility_criteria, key_benefits, sharia_certified, active,
-                source_website_id, source_url, scraped_at, data_quality_score, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb, ?, ?, ?, ?, ?, ?, NOW())
-            ON CONFLICT (product_code)
-            DO UPDATE SET
-                product_name = EXCLUDED.product_name,
-                description = EXCLUDED.description,
-                annual_rate = EXCLUDED.annual_rate,
-                annual_fee = EXCLUDED.annual_fee,
-                scraped_at = EXCLUDED.scraped_at,
-                data_quality_score = EXCLUDED.data_quality_score
+                source_website_id, source_url, scraped_at, data_quality_score,
+                scrape_log_id, approval_status, ai_suggested_category, ai_confidence,
+                ai_categorization_json, raw_html, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?::jsonb, ?, NOW())
             """;
 
         for (ScrapedProduct product : products) {
@@ -97,7 +94,11 @@ public class ScraperDatabaseService {
                         ? convertToJson(product.getEligibilityCriteria())
                         : "{}";
 
-                jdbcTemplate.update(upsertSql,
+                String aiCategorizationJson = product.getAiCategorizationJson() != null
+                        ? convertToJson(product.getAiCategorizationJson())
+                        : "{}";
+
+                jdbcTemplate.update(insertSql,
                         productCode,
                         product.getProductName(),
                         product.getCategory(),
@@ -115,7 +116,12 @@ public class ScraperDatabaseService {
                         product.getSourceWebsiteId(),
                         product.getSourceUrl(),
                         scrapedAt,
-                        product.getDataQualityScore()
+                        product.getDataQualityScore(),
+                        scrapeLogId,
+                        product.getAiSuggestedCategory(),
+                        product.getAiConfidence(),
+                        aiCategorizationJson,
+                        product.getRawHtml()
                 );
 
                 savedCount++;
@@ -171,6 +177,19 @@ public class ScraperDatabaseService {
             LIMIT 50
             """;
         return jdbcTemplate.queryForList(sql, websiteId);
+    }
+
+    /**
+     * Get scrape_log_id from job_id
+     */
+    private Long getScrapeLogIdByJobId(String jobId) {
+        String sql = "SELECT id FROM scrape_logs WHERE job_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Long.class, jobId);
+        } catch (Exception e) {
+            log.error("Failed to get scrape_log_id for job: {}", jobId, e);
+            return null;
+        }
     }
 
     /**

@@ -62,9 +62,9 @@ public class ScraperOrchestrationService {
                 }
             }
 
-            // Save products to database
-            log.info("Saving products to database");
-            int savedCount = databaseService.saveProducts(scrapedProducts, LocalDateTime.now());
+            // Save products to staging database
+            log.info("Saving products to staging table");
+            int savedCount = databaseService.saveProducts(scrapedProducts, LocalDateTime.now(), jobId);
 
             // Update scrape log
             databaseService.completeScrapeLog(jobId, scrapedProducts.size(), savedCount, null);

@@ -40,4 +40,9 @@ public class ScrapedProduct {
 
     // Raw HTML content for AI enrichment
     private String rawHtml;
+
+    // AI categorization fields
+    private String aiSuggestedCategory;
+    private BigDecimal aiConfidence;
+    private Map<String, Object> aiCategorizationJson;
 }
